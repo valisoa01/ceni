@@ -1,3 +1,4 @@
+import Classes.CandidateVoteCount;
 import Classes.VoteTypeCount;
 import Connection.DBRetriever;
 
@@ -13,6 +14,8 @@ public class Main {
 
         List<VoteTypeCount> resultats  = dbRetriever.countVotesByType();
         System.out.println(resultats);
+        List<CandidateVoteCount> count = dbRetriever.countValidVotesByCantidate();
+        System.out.println(count);
     }
 }
 

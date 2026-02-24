@@ -1,5 +1,6 @@
 package Connection;
 
+import Classes.CandidateVoteCount;
 import Classes.VoteType;
 import Classes.VoteTypeCount;
 
@@ -53,4 +54,30 @@ public class DBRetriever {
         }
         return resultats;
     }
-}
+    public List<CandidateVoteCount> countValidVotesByCantidate()
+    {
+        List<CandidateVoteCount> resultats = new ArrayList<>();
+        String sql = """
+                SELECT candidate.name AS candidate_name,
+                       COUNT(CASE WHEN vote.vote_type = 'VALID' THEN 0 END) AS valid_vote
+                FROM vote join candidate on vote.candidate_id = candidate.id
+                GROUP BY  candidate.name
+                ORDER BY candidate_name;
+                """;
+        try(Connection conn = DBConnection.getConnection();
+            PreparedStatement ps = conn.prepareStatement(sql);
+            ResultSet rs = ps.executeQuery()
+        ) {
+            while (rs.next()) {
+                String candidateName = rs.getString("candidate_name");
+                long count = rs.getLong("valid_vote");
+
+                resultats.add(new CandidateVoteCount(candidateName, count));
+            }
+         }
+        catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return resultats;
+    }
+ }
